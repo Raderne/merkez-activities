@@ -14,6 +14,7 @@ const AppProvider = ({ children }) => {
     type: "",
   });
   const [adminUser, setAdminUser] = useState(false);
+  const [deletedActivity, setDeletedActivity] = useState("");
 
   return (
     <AppContext.Provider
@@ -21,9 +22,11 @@ const AppProvider = ({ children }) => {
         adminUser,
         StorageAdminUser,
         message,
+        deletedActivity,
         setAdminUser,
         setStorageAdminUser,
         setMessage,
+        setDeletedActivity,
       }}
     >
       {children}

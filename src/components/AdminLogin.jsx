@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import { useGlobalContext } from "../utils/context";
 import { adminLogin } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -43,6 +43,7 @@ const AdminLogin = () => {
       }
     } catch (error) {
       setLoading(false);
+      setMessage({ message: "Bir hata oluştu", type: "error" });
       console.log(error);
     }
   };
@@ -55,11 +56,13 @@ const AdminLogin = () => {
 
   return (
     <div className="h-screen relative flex flex-col justify-center items-center">
-      <img
-        src={logo}
-        alt="logo"
-        className="absolute top-2 left-0 w-40 bg-white rounded-full shadow-lg"
-      />
+      <Link to="/">
+        <img
+          src={logo}
+          alt="logo"
+          className="absolute top-2 left-0 w-40 bg-white rounded-full shadow-lg"
+        />
+      </Link>
       <div className="w-96 bg-white py-10 px-8 rounded-lg border border-zinc-300 shadow-2xl">
         <h1 className="text-3xl text-center text-black mb-6">Admin Panel</h1>
         <form className="flex flex-col gap-y-4 p-4">
