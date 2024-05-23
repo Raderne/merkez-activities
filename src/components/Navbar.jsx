@@ -18,7 +18,7 @@ const Navbar = () => {
           Etkenlik Ekle
         </Link>
         <Link to="/etkinlik" className="text-lg">
-          Etkenlik İncele
+          Etkenlikler İncele
         </Link>
       </div>
 

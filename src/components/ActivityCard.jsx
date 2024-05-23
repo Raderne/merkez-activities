@@ -5,11 +5,14 @@ import gsap from "gsap";
 import { useRef, useState } from "react";
 import { useGlobalContext } from "../utils/context";
 import { deleteActivity } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 const ActivityCard = (props) => {
   const { index, id, title, description, date, time, quota, image, salon } =
     props;
-  const { StorageAdminUser, setMessage, setDeletedActivity } = useGlobalContext();
+  const navigate = useNavigate();
+  const { StorageAdminUser, setMessage, setDeletedActivity } =
+    useGlobalContext();
   const [loading, setLoading] = useState(false);
   const cardRef = useRef(null);
 
@@ -21,6 +24,21 @@ const ActivityCard = (props) => {
       delay: 0.5 * index,
     });
   }, []);
+
+  const handleEdit = (
+    id,
+    title,
+    description,
+    date,
+    time,
+    quota,
+    image,
+    salon
+  ) => {
+    navigate(`/edit/${id}`, {
+      state: { id, title, description, date, time, quota, image, salon },
+    });
+  };
 
   const handleDelete = async (id, image) => {
     setLoading(true);
@@ -60,7 +78,7 @@ const ActivityCard = (props) => {
               : description}
           </p>
           <p>
-            Zaman: {date} - {time} / Kontenjan: {quota}
+            Tarihi: {date} - {time} / Kontenjan: {quota}
           </p>
           <p>
             <span className="font-bold">Salon:</span> {salon}
@@ -78,8 +96,27 @@ const ActivityCard = (props) => {
       </div>
       {StorageAdminUser && (
         <div className="w-full flex justify-end items-center space-x-3 mt-2">
-          <button className="text-blue-500">Düzenle</button>
-          <button className="text-red-500" onClick={() => handleDelete(id, image)}>
+          <button
+            className="text-blue-500"
+            onClick={() =>
+              handleEdit(
+                id,
+                title,
+                description,
+                date,
+                time,
+                quota,
+                image,
+                salon
+              )
+            }
+          >
+            Düzenle
+          </button>
+          <button
+            className="text-red-500"
+            onClick={() => handleDelete(id, image)}
+          >
             {loading ? "Siliniyor..." : "Sil"}
           </button>
         </div>

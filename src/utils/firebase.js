@@ -5,6 +5,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { getStorage, ref, deleteObject } from "firebase/storage";
@@ -29,7 +30,10 @@ export const adminLogin = async (username, password) => {
 export const addActivity = async (form) => {
   try {
     const docRef = collection(db, "activities");
-    await addDoc(docRef, form);
+    await addDoc(docRef, {
+      ...form,
+      createdAt: new Date().toISOString(),
+    });
 
     return { success: true, message: "Etkinlik eklendi" };
   } catch (error) {
@@ -46,6 +50,10 @@ export const getAllActivities = async () => {
 
     docSnap.forEach((doc) => {
       activities.push({ ...doc.data(), id: doc.id });
+    });
+
+    activities.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
     return { success: true, activities };
@@ -70,5 +78,17 @@ export const deleteActivity = async (id, image) => {
   } catch (error) {
     console.log(error.message);
     return { success: false, message: "Etkinlik silinemedi" };
+  }
+};
+
+export const updateActivity = async (id, form) => {
+  try {
+    const docRef = doc(db, "activities", id);
+    await setDoc(docRef, form, { merge: true });
+
+    return { success: true, message: "Etkinlik güncellendi" };
+  } catch (error) {
+    console.log(error.message);
+    return { success: false, message: "Etkinlik güncellenemedi" };
   }
 };

@@ -6,6 +6,7 @@ import Panel from "./components/Panel";
 import Toast from "./components/Toast";
 import { useGlobalContext } from "./utils/context";
 import { useEffect } from "react";
+import EditActivity from "./components/EditActivity";
 
 function App() {
   const { message, setMessage } = useGlobalContext();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/etkinlik" element={<Activities />} />
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/panel" element={<Panel />} />
+        <Route path="/edit/:id" element={<EditActivity />} />
       </Routes>
       {message && (
         <Toast

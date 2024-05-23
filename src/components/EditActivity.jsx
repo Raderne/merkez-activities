@@ -1,16 +1,19 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { useGlobalContext } from "../utils/context";
+import { useEffect, useState } from "react";
 import {
+  getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
-  getDownloadURL,
 } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
-import { useGlobalContext } from "../utils/context";
-import { useEffect, useRef, useState } from "react";
-import { addActivity } from "../utils/firebase";
+import { updateActivity } from "../utils/firebase";
 
-const Panel = () => {
+const EditActivity = () => {
+  const location = useLocation();
+  const { id, title, description, date, time, quota, image, salon } =
+    location.state;
   const navigate = useNavigate();
   const { StorageAdminUser, setMessage } = useGlobalContext();
   const [form, setForm] = useState({
@@ -24,38 +27,23 @@ const Panel = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const imageRef = useRef(null);
-  const titleRef = useRef(null);
-  const descriptionRef = useRef(null);
-  const dateRef = useRef(null);
-  const timeRef = useRef(null);
-  const quotaRef = useRef(null);
-  const salonRef = useRef(null);
-
   useEffect(() => {
     if (!StorageAdminUser) {
       navigate("/login");
     }
   }, [StorageAdminUser, navigate]);
 
-  const clearInputs = () => {
+  useEffect(() => {
     setForm({
-      ...form,
-      title: "",
-      description: "",
-      date: "",
-      time: "",
-      quota: 0,
-      image: "",
+      title,
+      description,
+      date,
+      time,
+      quota,
+      image,
+      salon,
     });
-    imageRef.current.value = "";
-    titleRef.current.value = "";
-    descriptionRef.current.value = "";
-    dateRef.current.value = "";
-    timeRef.current.value = "";
-    quotaRef.current.value = "";
-    salonRef.current.value = "A";
-  };
+  }, []);
 
   const handleChanges = (e) => {
     const { name, value } = e.target;
@@ -145,7 +133,7 @@ const Panel = () => {
     }
 
     try {
-      const res = await addActivity(form);
+      const res = await updateActivity(id, form);
 
       if (!res.success) {
         setMessage({
@@ -161,8 +149,7 @@ const Panel = () => {
         type: "success",
       });
       setLoading(false);
-
-      clearInputs();
+      navigate("/etkinlik");
     } catch (error) {
       setMessage({
         message: error.message,
@@ -176,11 +163,24 @@ const Panel = () => {
       <Navbar />
 
       <div className="relative flex flex-col gap-y-4 items-center mt-8 mb-14">
-        <h1 className="text-center text-4xl font-bold">Etkinlik Formu</h1>
+        <h1 className="text-center text-4xl font-bold">
+          Etkinlik Düzenleme Formu
+        </h1>
         <div className="w-[50vw] py-8 px-10 border border-gray-400 rounded-lg shadow-lg">
-          <div className="">
+          {image && (
+            <div className="">
+              <img
+                src={image}
+                alt="image"
+                className="object-cover h-60 object-center w-full"
+              />
+            </div>
+          )}
+          <div className="mt-4">
             <label htmlFor="image" className="block text-lg font-semibold">
-              Resim:
+              {image
+                ? "Etkinlik Resmi (Değiştirmek için yeni resim yükleyin)"
+                : "Etkinlik Resmi"}
             </label>
             <input
               type="file"
@@ -188,7 +188,6 @@ const Panel = () => {
               className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
               name="image"
               onChange={handleChanges}
-              ref={imageRef}
             />
           </div>
 
@@ -202,7 +201,7 @@ const Panel = () => {
               className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
               name="title"
               onChange={handleChanges}
-              ref={titleRef}
+              value={form.title}
             />
           </div>
           <div className="mt-4">
@@ -218,7 +217,7 @@ const Panel = () => {
               className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
               name="description"
               onChange={handleChanges}
-              ref={descriptionRef}
+              value={form.description}
             />
           </div>
 
@@ -232,7 +231,7 @@ const Panel = () => {
               className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
               name="date"
               onChange={handleChanges}
-              ref={dateRef}
+              value={form.date}
             />
           </div>
 
@@ -246,7 +245,7 @@ const Panel = () => {
               className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
               name="time"
               onChange={handleChanges}
-              ref={timeRef}
+              value={form.time}
             />
           </div>
 
@@ -262,7 +261,7 @@ const Panel = () => {
                 min={0}
                 name="quota"
                 onChange={handleChanges}
-                ref={quotaRef}
+                value={form.quota}
               />
             </div>
 
@@ -275,7 +274,7 @@ const Panel = () => {
                 className=" w-full p-2 border border-gray-400 rounded-lg mt-2"
                 name="salon"
                 onChange={handleChanges}
-                ref={salonRef}
+                value={form.salon}
               >
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -288,7 +287,7 @@ const Panel = () => {
             className="w-full bg-blue-500 text-white text-lg font-semibold py-2 mt-6 rounded-lg hover:bg-blue-600 transition-all duration-200"
             onClick={handleSubmit}
           >
-            {loading ? "Yükleniyor..." : "Etkinliği Ekle"}
+            {loading ? "Yükleniyor..." : "Etkinliği Düzenle"}
           </button>
         </div>
       </div>
@@ -296,4 +295,4 @@ const Panel = () => {
   );
 };
 
-export default Panel;
+export default EditActivity;
